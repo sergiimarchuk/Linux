@@ -2,7 +2,7 @@
 
 ## 🎯 Goal
 
-Set up a local BIND DNS server for the domain **p-stat.org.local** in
+Set up a local BIND DNS server for the domain **ps-state.org.local** in
 the `192.168.100.0/24` network, and ensure name resolution on all
 network clients.
 
@@ -26,9 +26,9 @@ sudo systemctl start named
 File: `/etc/named.d/zone.conf`
 
 ``` conf
-zone "p-stat.org.local" IN {
+zone "ps-state.org.local" IN {
     type master;
-    file "/var/lib/named/master/p-stat.org.local.db";
+    file "/var/lib/named/master/ps-state.org.local.db";
     allow-update { none; };
 };
 
@@ -45,22 +45,22 @@ Include the file in `/etc/named.conf`:
 include "/etc/named.d/zone.conf";
 ```
 
-## 📄 4. Forward Zone File p-stat.org.local
+## 📄 4. Forward Zone File ps-state.org.local
 
-Path: `/var/lib/named/master/p-stat.org.local.db`
+Path: `/var/lib/named/master/ps-state.org.local.db`
 
 ``` dns
 $TTL 3600
-@   IN  SOA mx.p-stat.org.local. root.p-stat.org.local. (
+@   IN  SOA mx.ps-state.org.local. root.ps-state.org.local. (
         2025100301 ; Serial
         10800      ; Refresh
         3600       ; Retry
         604800     ; Expire
         86400 )    ; Minimum TTL
 
-@   IN  NS   mx.p-stat.org.local.
+@   IN  NS   mx.ps-state.org.local.
 @   IN  A    192.168.100.205
-@   IN  MX 10 mx.p-stat.org.local.
+@   IN  MX 10 mx.ps-state.org.local.
 
 www IN  CNAME @
 mx  IN  A    192.168.100.205   ; primary DNS and mail server
@@ -73,16 +73,16 @@ Path: `/var/lib/named/master/100.168.192.in-addr.arpa.db`
 
 ``` dns
 $TTL 3600
-@   IN  SOA mx.p-stat.org.local. root.p-stat.org.local. (
+@   IN  SOA mx.ps-state.org.local. root.ps-state.org.local. (
         2025100301 ; Serial
         10800
         3600
         604800
         86400 )
 
-@   IN  NS   mx.p-stat.org.local.
-205 IN  PTR  p-stat.org.local.
-201 IN  PTR  base-host-01.p-stat.org.local.
+@   IN  NS   mx.ps-state.org.local.
+205 IN  PTR  ps-state.org.local.
+201 IN  PTR  base-host-01.ps-state.org.local.
 ```
 
 ## 🔒 6. Zone File Permissions
@@ -96,7 +96,7 @@ sudo chmod 644 /var/lib/named/master/*.db
 
 ``` bash
 sudo named-checkconf
-sudo named-checkzone p-stat.org.local /var/lib/named/master/p-stat.org.local.db
+sudo named-checkzone ps-state.org.local /var/lib/named/master/ps-state.org.local.db
 sudo named-checkzone 100.168.192.in-addr.arpa /var/lib/named/master/100.168.192.in-addr.arpa.db
 ```
 
@@ -121,7 +121,7 @@ Modify or add the following lines:
 
 ``` conf
 NETCONFIG_DNS_STATIC_SERVERS="192.168.100.201 8.8.8.8"
-NETCONFIG_DNS_STATIC_SEARCHLIST="p-stat.org.local"
+NETCONFIG_DNS_STATIC_SEARCHLIST="ps-state.org.local"
 ```
 
 Apply settings:
@@ -134,16 +134,16 @@ Now `/etc/resolv.conf` will contain:
 
 ``` conf
 nameserver 192.168.100.201
-search p-stat.org.local
+search ps-state.org.local
 nameserver 8.8.8.8
 ```
 
 ## 🧪 10. Testing
 
 ``` bash
-ping base-host-01.p-stat.org.local
+ping base-host-01.ps-state.org.local
 ping base-host-01
-dig base-host-01.p-stat.org.local
+dig base-host-01.ps-state.org.local
 dig -x 192.168.100.201
 ```
 
@@ -175,14 +175,14 @@ dig -x 192.168.100.201
 
 ``` dns
 $TTL 3600
-@   IN  SOA mx.p-stat.org.local. root.p-stat.org.local. (
+@   IN  SOA mx.ps-state.org.local. root.ps-state.org.local. (
         2025100301 ; Serial
         10800
         3600
         604800
         86400 )
 
-@   IN  NS   mx.p-stat.org.local.
+@   IN  NS   mx.ps-state.org.local.
 @   IN  A    192.168.100.205
 mx  IN  A    192.168.100.205
 base-host-01 IN A 192.168.100.201
@@ -196,14 +196,14 @@ Added a new host **base-host-02** with IP `192.168.100.202`.
 
 ``` dns
 $TTL 3600
-@   IN  SOA mx.p-stat.org.local. root.p-stat.org.local. (
+@   IN  SOA mx.ps-state.org.local. root.ps-state.org.local. (
         2025100302 ; Serial (increased!)
         10800
         3600
         604800
         86400 )
 
-@   IN  NS   mx.p-stat.org.local.
+@   IN  NS   mx.ps-state.org.local.
 @   IN  A    192.168.100.205
 mx  IN  A    192.168.100.205
 base-host-01 IN A 192.168.100.201
