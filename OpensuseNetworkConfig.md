@@ -32,6 +32,8 @@ File for global network parameters:
 
 ```
 /etc/sysconfig/network/config
+
+/etc/sysconfig/network/ifroute-eth0
 ```
 
 Contains options like hostname, default route behavior, etc.
