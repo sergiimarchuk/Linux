@@ -12,7 +12,7 @@ Then restart the VM.
 
 Linux will see the interface with the same MAC and assign it as `eth0` again.
 
-⚠️ **Warning:** This can conflict with production VM 101 if both VMs are on the network simultaneously.
+⚠️ **Warning:** This has been tested on Prox mox env.
 
 ---
 
