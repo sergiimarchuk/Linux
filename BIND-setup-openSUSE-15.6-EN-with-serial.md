@@ -223,6 +223,32 @@ base-host-02 IN A 192.168.100.202
 
 ---
 
+**Key point:** Always increase the Serial number when you make any
+change.\
+Otherwise, BIND and clients may continue to use old cached data.
+
+#
+#
+#
+
+# DNS Records Reference (ps-state.org.local)
+
+This table summarizes the main DNS record types used in the BIND configuration for `ps-state.org.local`, their purpose, practical reason, example, and the zone file where they are stored.
+
+| Type | Description | Purpose / Practical Reason | Example | Zone File |
+|------|------------|---------------------------|--------|-----------|
+| **SOA** | Start of Authority, “passport” of the zone. | Allows secondary DNS servers to know where to get the current zone data and when to refresh cache. | `@ IN SOA mx.ps-state.org.local. root.ps-state.org.local. (2025100301 10800 3600 604800 86400)` | `/var/lib/named/master/ps-state.org.local.db` |
+| **NS** | Name Server — authoritative DNS server for the zone. | Lets any DNS query know which server holds authoritative information for this zone. | `@ IN NS mx.ps-state.org.local.` | `/var/lib/named/master/ps-state.org.local.db` |
+| **A** | Maps a domain name to an IPv4 address. | Main way to find a server by name. | `base-host-01 IN A 192.168.100.201` | `/var/lib/named/master/ps-state.org.local.db` |
+| **AAAA** | Maps a domain name to an IPv6 address. | Same as A, but for IPv6. | `host-ipv6 IN AAAA 2001:db8::1` | `/var/lib/named/master/ps-state.org.local.db` |
+| **CNAME** | Canonical Name — alias to another name. | Avoids duplicating IP addresses; allows multiple names pointing to the same host. | `www IN CNAME @` | `/var/lib/named/master/ps-state.org.local.db` |
+| **MX** | Mail Exchange — mail server for the domain. | Ensures email is delivered to the correct server for the domain. | `@ IN MX 10 mx.ps-state.org.local.` | `/var/lib/named/master/ps-state.org.local.db` |
+| **PTR** | Pointer record (IP → hostname), used in reverse zones. | Critical for email: checks IP ↔ hostname match. Without proper PTR, mail may be flagged as spam. Helps spam filters verify the server is legitimate. | `201 IN PTR base-host-01.ps-state.org.local.` | `/var/lib/named/master/100.168.192.in-addr.arpa.db` |
+| **TXT** | Text record, often for SPF, DKIM, domain verification. | Verifies domain authenticity and mail settings, stores arbitrary metadata. | `@ IN TXT "v=spf1 mx -all"` | `/var/lib/named/master/ps-state.org.local.db` |
+| **SRV** | Service record (e.g., LDAP, SIP). | Allows clients to automatically locate a service by priority and port. | `_ldap._tcp IN SRV 0 5 389 ldap.ps-state.org.local.` | `/var/lib/named/master/ps-state.org.local.db` |
+
+
+
 ## 📊 DNS Records Reference (ps-state.org.local)
 
 | Type | Description | Purpose / Example | Zone File |
