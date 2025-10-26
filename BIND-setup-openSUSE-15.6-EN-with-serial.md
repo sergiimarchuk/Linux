@@ -176,6 +176,20 @@ dig -x 192.168.100.201
 
 Your local BIND server can resolve external domains by querying root servers first. For example, `a.root-servers.net` and `b.root-servers.net` are root DNS servers responsible for the "." (root) zone. These root servers have information about top-level domains like `.com`, which in turn have authoritative information for `yahoo.com` or any other domain. When your server queries an external domain, it starts at the root, goes to the appropriate TLD server (e.g., `.com`), and then reaches the authoritative server for the requested domain.
 
+
+file /etc/named.conf and this code 
+
+zone "." in {
+	type hint;
+	file "root.hint";
+};
+
+is responsible to resolve external dns name the first step forward on root dns server as example these servers : 
+
+`a.root-servers.net` and `b.root-servers.net`
+
+and then go to .com dns server and then yahoo.com
+
 ---
 
 ## 📌 Notes
