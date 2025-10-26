@@ -249,17 +249,3 @@ This table summarizes the main DNS record types used in the BIND configuration f
 
 
 
-## 📊 DNS Records Reference (ps-state.org.local)
-
-| Type | Description | Purpose / Example | Zone File |
-|------|------------|-----------------|-----------|
-| **SOA** | Start of Authority | Zone metadata, refresh, expiry info | `/var/lib/named/master/ps-state.org.local.db` |
-| **NS** | Name Server | Authoritative server for the zone | `/var/lib/named/master/ps-state.org.local.db` |
-| **A** | IPv4 address | Maps hostname → IP | `/var/lib/named/master/ps-state.org.local.db` |
-| **AAAA** | IPv6 address | Maps hostname → IPv6 | `/var/lib/named/master/ps-state.org.local.db` |
-| **CNAME** | Canonical Name | Alias for another hostname | `/var/lib/named/master/ps-state.org.local.db` |
-| **MX** | Mail Exchange | Mail server for domain | `/var/lib/named/master/ps-state.org.local.db` |
-| **PTR** | Pointer | Reverse DNS (IP → hostname) | `/var/lib/named/master/100.168.192.in-addr.arpa.db` |
-| **TXT** | Text record | SPF, DKIM, domain verification | `/var/lib/named/master/ps-state.org.local.db` |
-| **SRV** | Service record | Auto-locate services (LDAP, SIP) | `/var/lib/named/master/ps-state.org.local.db` |
-
