@@ -1,5 +1,25 @@
 # High Availability Cluster with Pacemaker and Corosync on openSUSE Leap 15.6
 
+# 1. Enable required repositories
+sudo zypper modifyrepo --enable repo-oss
+sudo zypper modifyrepo --enable repo-update
+sudo zypper modifyrepo --enable repo-sle-update
+
+# 2. Refresh repositories
+sudo zypper refresh
+
+# 3. Install cluster packages (without recommended packages to avoid network issues)
+sudo zypper install -y --no-recommends pacemaker pacemaker-cli corosync crmsh resource-agents
+
+# 4. Set hacluster user password (use the SAME password as node-01)
+sudo passwd hacluster
+
+# 5. Enable services (don't start yet)
+sudo systemctl enable pacemaker
+sudo systemctl enable corosync
+
+
+
 **⚠️ IMPORTANT NOTICE:**
 - ✅ This guide creates a **LAB/TESTING** cluster setup
 - ❌ Current configuration is **NOT SAFE for production** (diskless SBD, no fencing)
