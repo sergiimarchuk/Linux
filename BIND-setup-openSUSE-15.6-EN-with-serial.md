@@ -239,28 +239,28 @@ base-host-02 IN A 192.168.100.202
 
 ⚙️ Diagnosis
 
-So, the issue is DNS resolution doesn’t work on bobby, but it does on your BIND server.
+## So, the issue is DNS resolution doesn’t work on bobby, but it does on your BIND server.
 
-That suggests one (or more) of these on bobby:
+** That suggests one (or more) of these on bobby: **
 
-/etc/resolv.conf is missing or misconfigured
+```/etc/resolv.conf is missing or misconfigured ```
 
-It likely doesn’t point to your DNS server (base-host-01).
+** It likely doesn’t point to your DNS server (base-host-01). **
 
-/etc/nsswitch.conf isn’t configured to use DNS
+- /etc/nsswitch.conf isn’t configured to use DNS
 
-It should have a line like:
+- It should have a line like:
 
-hosts: files dns
+``hosts: files dns``
 
 
-Firewall or network isolation between bobby and your DNS server.
+- Firewall or network isolation between bobby and your DNS server.
 
-Less likely, since bobby and the DNS server are on the same subnet (192.168.100.x), and ping works fine.
+- Less likely, since bobby and the DNS server are on the same subnet (192.168.100.x), and ping works fine. 
 
-Local caching resolver (systemd-resolved or dnsmasq) misconfiguration.
+- Local caching resolver (systemd-resolved or dnsmasq) misconfiguration.
 
-Could cause it to ignore the correct nameserver.
+- Could cause it to ignore the correct nameserver.
 
 ---
 
