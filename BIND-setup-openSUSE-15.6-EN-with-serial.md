@@ -239,7 +239,7 @@ base-host-02 IN A 192.168.100.202
 
 ⚙️ Diagnosis
 
-## So, the issue is DNS resolution doesn’t work on bobby, but it does on your BIND server.
+## So, the issue is DNS resolution doesn’t work on seome hosts just very common issue especially erarlier,  but it does on your BIND server, only something local, see point 9 upper.
 
 ** That suggests one (or more) of these on bobby: **
 
