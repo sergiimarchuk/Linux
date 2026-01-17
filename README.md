@@ -41,10 +41,10 @@ This repository serves as a centralized knowledge base for Linux system administ
 
 **BIND DNS Server Setup & Configuration**
 
-- **[BIND DNS Setup (openSUSE Leap 15.6)](./BIND-setup-opensuse-15.6-EN-with-serial.md)**  
+- **[BIND DNS Setup (openSUSE Leap 15.6)](./dns/BIND-setup-openSUSE-15.6-EN-with-serial.md)**  
   Complete guide for configuring a local BIND DNS server with serial number management. Includes zone file configuration, forward/reverse DNS, and testing procedures.
 
-- **[BIND DNS Setup with Backup (openSUSE Leap 15.6)](./BIND-setup-opensuse-15.6-EN-with-serial-bckp.md)**  
+- **[BIND DNS Setup with Backup (openSUSE Leap 15.6)](./dns/BIND-setup-openSUSE-15.6-EN-with-serial-bckp.md)**  
   Enhanced BIND setup guide featuring backup strategies, redundancy configuration, and disaster recovery procedures.
 
 ---
@@ -53,10 +53,7 @@ This repository serves as a centralized knowledge base for Linux system administ
 
 **Enterprise HA Solutions with Pacemaker & Corosync**
 
-- **[High Availability Cluster – Pacemaker (openSUSE)](./High-Availability-Cluster-PacemakerO-Suse.md)**  
-  Step-by-step guide for implementing Pacemaker-based HA clusters. Covers resource management, fencing, and failover configurations.
-
-- **[openSUSE HA Cluster Setup](./openSUSE-HA-Cluster-Setup.md)**  
+- **[openSUSE HA Cluster Setup](./clustering/openSUSE-HA-Cluster-Setup.md)**  
   Comprehensive documentation for building production-ready HA clusters on openSUSE, including network setup, shared storage, and monitoring.
 
 ---
@@ -65,11 +62,8 @@ This repository serves as a centralized knowledge base for Linux system administ
 
 **SAN Storage & iSCSI Configuration**
 
-- **[iSCSI Cluster Setup](./ISCSI-cluster-setup.md)**  
-  Detailed guide for implementing iSCSI-based shared storage in clustered environments. Includes initiator/target configuration and multipath I/O.
-
-- **[iSCSI Cluster Setup (Extended Documentation)](./iscsi_cluster_setup_doc.md)**  
-  Additional reference material with advanced iSCSI configurations, troubleshooting steps, and performance tuning.
+- **[iSCSI Cluster Setup (Extended Documentation)](./storage/iscsi_cluster_setup_doc.md)**  
+  Complete reference material with iSCSI configurations, initiator/target setup, multipath I/O, troubleshooting steps, and performance tuning.
 
 ---
 
@@ -77,10 +71,7 @@ This repository serves as a centralized knowledge base for Linux system administ
 
 **Kubernetes Implementation & Management**
 
-- **[Kubernetes Install Guide](./k8s-install-guide.md)**  
-  Production-ready Kubernetes cluster installation guide. Covers kubeadm setup, network plugins, and initial cluster configuration.
-
-- **[Kubernetes Storage Guide](./k8s-storage-guide.md)**  
+- **[Kubernetes Storage Guide](./kubernetes/k8s-storage-guide.md)**  
   Comprehensive overview of Kubernetes storage solutions including Persistent Volumes (PV), Persistent Volume Claims (PVC), Storage Classes, and dynamic provisioning.
 
 ---
@@ -89,8 +80,7 @@ This repository serves as a centralized knowledge base for Linux system administ
 
 **Hardware Monitoring & Performance**
 
-- **[CPU Temperature & Fan Monitoring (Linux)](./CPU-Temperature-Fan-Monitoring-Linux.md)**  
-  Guide for monitoring system temperatures and fan speeds using `lm-sensors`, `psensor`, and other tools. Essential for server thermal management.
+Documentation coming soon. This section will cover CPU temperature monitoring, fan speed control, and system performance tools.
 
 ---
 
@@ -98,10 +88,7 @@ This repository serves as a centralized knowledge base for Linux system administ
 
 **Network Interface Management**
 
-- **[openSUSE Network Configuration](./OpenSuse-Network-Config.md)**  
-  Complete guide for network configuration on openSUSE systems using `wicked` and `NetworkManager`. Includes static IP, bonding, and VLAN setup.
-
-- **[Cloned VM Network Interface Guide](./Cloned-VM-Network-Interface-Guide.md)**  
+- **[Cloned VM Network Interface Guide](./networking/Cloned-VM-Network-Interface-Guide.md)**  
   Troubleshooting and fixing network interface issues in cloned virtual machines. Resolves MAC address conflicts and interface naming problems.
 
 ---
@@ -110,8 +97,7 @@ This repository serves as a centralized knowledge base for Linux system administ
 
 **Best Practices & Quick References**
 
-- **[Linux Tips](./Linux-Tips.md)**  
-  Collection of useful commands, shortcuts, and best practices for daily Linux administration tasks.
+Documentation coming soon. This section will include useful commands, shortcuts, and best practices for daily Linux administration tasks.
 
 ---
 
