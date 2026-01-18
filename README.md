@@ -1,4 +1,4 @@
-# Linux System Administration & Infrastructure Guides
+#🐧 Linux System Administration & Infrastructure Guides
 
 A comprehensive collection of enterprise-grade Linux documentation, guides, and best practices for system administrators and DevOps engineers.
 
