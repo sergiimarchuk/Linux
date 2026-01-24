@@ -139,3 +139,34 @@ rsync -av my-tracker/* root@192.168.100.60:/opt/dev-py/tempo_Go/my-tracker
   `*` → only visible files, hidden files are skipped.
 - Слеш на DESTINATION зазвичай необов’язковий, але краще ставити для ясності.  
   Slash on DESTINATION is usually optional, but better to include f
+
+Quick Fixes to Try First
+1. Restart the File Manager (Nautilus)
+Open a terminal (Ctrl+Alt+T) and run:
+bash 
+
+```bash killall nautilus
+Then try opening directories again. The file manager may freeze and need to be restarted Zorin Forum.
+
+2. Check Double-Click Settings
+By default, you need to double-click folders to open them in the file manager Ubuntu Community. Make sure you're double-clicking, not single-clicking.
+
+3. Verify File Manager is Running
+Try opening the file manager directly:
+
+Press the Super key and search for "Files" or "Nautilus"
+Or click the Files icon in the Ubuntu Dock
+
+If the Problem Persists
+Check for WSL or Desktop Extensions Issues
+Some users found that WSL (Windows Subsystem for Linux) or the GNOME shell extension DING (desktop icons) caused issues where files and folders couldn't be opened Launchpad. If you have desktop icons enabled, try disabling the desktop icons extension.
+Reset Nautilus Settings
+bash
+
+```bash gsettings reset-recursively org.gnome.nautilus
+Reinstall Nautilus
+bash
+
+```bash sudo apt update
+
+```bash sudo apt install --reinstall nautilus
