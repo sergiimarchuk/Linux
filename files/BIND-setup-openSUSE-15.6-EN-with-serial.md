@@ -290,4 +290,280 @@ This table summarizes the main DNS record types used in the BIND configuration f
 | **SRV** | Service record (e.g., LDAP, SIP). | Allows clients to automatically locate a service by priority and port. | `_ldap._tcp IN SRV 0 5 389 ldap.ps-state.org.local.` | `/var/lib/named/master/ps-state.org.local.db` |
 
 
+# 🔧 BIND DNS Auto-Update — Kubernetes Nodes
+
+Auto-update BIND DNS zone files from a VM config JSON file.  
+Path: `/opt/update-bind-k8s-nodes/`
+
+---
+
+## 📄 `update_dns_zones.py`
+
+```python
+#!/usr/bin/env python3
+"""
+update_dns_zones.py
+-------------------
+Reads osuse_vms_config.json and automatically updates BIND DNS zone files:
+  - Forward zone:  ps-state.org.local.db
+  - Reverse zone:  100.168.192.in-addr.arpa.db
+
+Usage:
+  python3 update_dns_zones.py [--config PATH] [--dry-run]
+
+Options:
+  --config   Path to the JSON config file (default: ./osuse_vms_config.json)
+  --dry-run  Print what would be changed without writing files
+"""
+
+import json
+import os
+import re
+import shutil
+import argparse
+from datetime import datetime
+
+# ── Paths ────────────────────────────────────────────────────────────────────
+DEFAULT_CONFIG   = "./osuse_vms_config.json"
+FORWARD_ZONE     = "/var/lib/named/master/ps-state.org.local.db"
+REVERSE_ZONE     = "/var/lib/named/master/100.168.192.in-addr.arpa.db"
+DOMAIN           = "ps-state.org.local"
+
+# ── Helpers ──────────────────────────────────────────────────────────────────
+
+def load_config(path):
+    with open(path) as f:
+        return json.load(f)
+
+
+def next_serial(current: str) -> str:
+    """
+    Serial format: YYYYMMDDnn  (e.g. 2025100301)
+    Increments the daily counter (nn), or bumps the date if today is newer.
+    """
+    today = datetime.now().strftime("%Y%m%d")
+    if current[:8] == today:
+        nn = int(current[8:]) + 1
+        return f"{today}{nn:02d}"
+    else:
+        return f"{today}01"
+
+
+def backup(path):
+    bak = path + ".bak"
+    shutil.copy2(path, bak)
+    print(f"  📦 Backup: {bak}")
+
+
+def read_zone(path):
+    with open(path) as f:
+        return f.read()
+
+
+def write_zone(path, content, dry_run):
+    if dry_run:
+        print(f"\n{'─'*60}")
+        print(f"  [DRY-RUN] Would write to: {path}")
+        print(f"{'─'*60}")
+        print(content)
+    else:
+        backup(path)
+        with open(path, "w") as f:
+            f.write(content)
+        print(f"  ✅ Written: {path}")
+
+
+def get_current_serial(zone_text):
+    m = re.search(r'(\d{10})\s*;?\s*[Ss]erial', zone_text)
+    if not m:
+        raise ValueError("Could not find serial number in zone file.")
+    return m.group(1)
+
+
+def update_serial(zone_text, new_serial):
+    return re.sub(
+        r'(\d{10})(\s*;?\s*[Ss]erial)',
+        lambda m: f"{new_serial}{m.group(2)}",
+        zone_text,
+        count=1
+    )
+
+# ── Section markers ──────────────────────────────────────────────────────────
+
+SECTION_START = "; --- Auto-managed VM entries (do not edit below) ---"
+SECTION_END   = "; --- End auto-managed VM entries ---"
+
+
+def replace_managed_section(zone_text, new_block):
+    """Replace the auto-managed section, or append it if not present."""
+    if SECTION_START in zone_text:
+        pattern = re.escape(SECTION_START) + r'.*?' + re.escape(SECTION_END)
+        zone_text = re.sub(pattern, new_block, zone_text, flags=re.DOTALL)
+    else:
+        zone_text = zone_text.rstrip() + "\n\n" + new_block + "\n"
+    return zone_text
+
+# ── Zone builders ─────────────────────────────────────────────────────────────
+
+def build_forward_block(vms):
+    lines = [SECTION_START]
+    for vm in vms:
+        name = vm["name"]
+        ip   = vm["ip"]
+        lines.append(f"{name:<20} IN  A    {ip}")
+    lines.append(SECTION_END)
+    return "\n".join(lines)
+
+
+def build_reverse_block(vms):
+    lines = [SECTION_START]
+    for vm in vms:
+        name   = vm["name"]
+        last   = vm["ip"].split(".")[-1]
+        fqdn   = f"{name}.{DOMAIN}."
+        lines.append(f"{last:<6} IN  PTR  {fqdn}")
+    lines.append(SECTION_END)
+    return "\n".join(lines)
+
+# ── Main ─────────────────────────────────────────────────────────────────────
+
+def main():
+    parser = argparse.ArgumentParser(description="Auto-update BIND DNS zones from VM config JSON.")
+    parser.add_argument("--config",  default=DEFAULT_CONFIG, help="Path to osuse_vms_config.json")
+    parser.add_argument("--dry-run", action="store_true",    help="Print changes without writing files")
+    args = parser.parse_args()
+
+    print(f"\n🔍 Loading config: {args.config}")
+    config = load_config(args.config)
+    vms    = config["vms"]
+
+    print(f"   Found {len(vms)} VMs:")
+    for vm in vms:
+        print(f"     • {vm['name']:<20}  {vm['ip']}")
+
+    for zone_path, build_block_fn, label in [
+        (FORWARD_ZONE, build_forward_block, "Forward"),
+        (REVERSE_ZONE, build_reverse_block, "Reverse"),
+    ]:
+        print(f"\n📄 Updating {label} zone: {zone_path}")
+
+        if not os.path.exists(zone_path):
+            print(f"  ⚠️  File not found, skipping: {zone_path}")
+            continue
+
+        zone_text  = read_zone(zone_path)
+        old_serial = get_current_serial(zone_text)
+        new_serial = next_serial(old_serial)
+
+        print(f"  🔢 Serial: {old_serial} → {new_serial}")
+
+        zone_text = update_serial(zone_text, new_serial)
+        zone_text = replace_managed_section(zone_text, build_block_fn(vms))
+
+        write_zone(zone_path, zone_text, args.dry_run)
+
+    if not args.dry_run:
+        print("\n🔄 Reloading BIND...")
+        ret = os.system("sudo rndc reload")
+        if ret == 0:
+            print("  ✅ BIND reloaded successfully.")
+        else:
+            print("  ⚠️  rndc reload failed — check BIND logs with: journalctl -u named -f")
+
+    print("\n✅ Done!\n")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+## 📄 `osuse_vms_config.json`
+
+```json
+{
+  "defaults": {
+    "image_path": "/opt/creation_vm/openSUSE-Leap-15.6-Minimal-VM.x86_64-Cloud.qcow2",
+    "gateway": "192.168.100.108",
+    "nameserver": "192.168.100.201 8.8.8.8 1.1.1.1",
+    "storage": "local-lvm",
+    "bridge": "vmbr0"
+  },
+  "vms": [
+    {
+      "id": 800,
+      "name": "k8s-master-1",
+      "memory": 4096,
+      "cores": 2,
+      "disk": 32,
+      "ip": "192.168.100.150",
+      "password": "12345678",
+      "start": false
+    },
+    {
+      "id": 802,
+      "name": "k8s-worker-1",
+      "memory": 4096,
+      "cores": 2,
+      "disk": 32,
+      "ip": "192.168.100.151",
+      "password": "12345678",
+      "start": false
+    },
+    {
+      "id": 803,
+      "name": "k8s-worker-2",
+      "memory": 4096,
+      "cores": 2,
+      "disk": 32,
+      "ip": "192.168.100.152",
+      "password": "12345678",
+      "start": false
+    }
+  ]
+}
+```
+
+---
+
+## 🚀 Usage
+
+**Normal run** — writes zone files and reloads BIND:
+```bash
+python3 update_dns_zones.py --config ./osuse_vms_config.json
+```
+
+**Dry run** — preview only, nothing is written:
+```bash
+python3 update_dns_zones.py --config ./osuse_vms_config.json --dry-run
+```
+
+---
+
+## ⚙️ What It Does
+
+| Step | Action |
+|------|--------|
+| 1 | Reads all VMs from `osuse_vms_config.json` |
+| 2 | Increments the DNS serial (`YYYYMMDDnn`) |
+| 3 | Creates `.bak` backup of each zone file |
+| 4 | Inserts/replaces the auto-managed block in forward + reverse zones |
+| 5 | Runs `rndc reload` to apply changes |
+
+> ⚠️ The auto-managed block is clearly marked — everything outside it is left untouched.
+
+```dns
+; --- Auto-managed VM entries (do not edit below) ---
+k8s-master-1         IN  A    192.168.100.150
+k8s-worker-1         IN  A    192.168.100.151
+k8s-worker-2         IN  A    192.168.100.152
+; --- End auto-managed VM entries ---
+```
+
+
+
+
+
+
 
